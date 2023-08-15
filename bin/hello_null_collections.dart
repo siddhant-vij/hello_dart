@@ -1,4 +1,4 @@
-import 'package:characters/characters.dart';
+// import 'package:characters/characters.dart';
 import 'dart:math';
 import 'package:json_annotation/json_annotation.dart';
 // import 'dart:io';
@@ -260,17 +260,17 @@ Map<String, int> characterFrequency1(String paragraph) {
   return frequency;
 }
 
-Map<String, int> characterFrequency2(String paragraph) {
-  Map<String, int> frequency = {};
-  for (var character in paragraph.characters) {
-    if (frequency.containsKey(character)) {
-      frequency[character] = frequency[character]! + 1;
-    } else {
-      frequency[character] = 1;
-    }
-  }
-  return frequency;
-}
+// Map<String, int> characterFrequency2(String paragraph) {
+//   Map<String, int> frequency = {};
+//   for (var character in paragraph.characters) {
+//     if (frequency.containsKey(character)) {
+//       frequency[character] = frequency[character]! + 1;
+//     } else {
+//       frequency[character] = 1;
+//     }
+//   }
+//   return frequency;
+// }
 
 @JsonSerializable()
 class Widget {
@@ -298,35 +298,88 @@ Iterable<int> squares(int n) sync* {
 }
 
 class FibonacciIterator implements Iterator<int> {
-  final int? n;
-  int _current = 0;
-  int _previous = 1;
-  var _counter = 0;
+  final int n;
+  int _index = -1;
+  final List<int> _fibonacci = [];
 
   FibonacciIterator(this.n);
 
   @override
-  int current() => _current;
+  int get current {
+    if (_index >= 0 && _index <= n) {
+      return _fibonacci[_index];
+    } else {
+      return 0;
+    }
+  }
 
   @override
   bool moveNext() {
-    if (_counter > 0 && n != null && _counter >= n!) {
+    if (_index == -1) {
+      _index++;
+      _fibonacci.add(0);
+      return true;
+    } else if (_index == 0) {
+      _index++;
+      _fibonacci.add(1);
+      return true;
+    } else if (_index < n) {
+      _index++;
+      _fibonacci.add(_fibonacci[_index - 1] + _fibonacci[_index - 2]);
+      return true;
+    } else {
       return false;
     }
-    int next = _previous + _current;
-    _previous = _current;
-    _current = next;
-    _counter++;
-    return true;
   }
 }
 
 class Fibonacci extends Iterable<int> {
-  final int? n;
+  final int n;
   const Fibonacci(this.n);
 
   @override
   Iterator<int> get iterator => FibonacciIterator(n);
+}
+
+class SentenceIterator implements Iterator<String> {
+  final String? sentence;
+  final List<String> _words = [];
+  int _index = -1;
+
+  SentenceIterator(this.sentence) {
+    if (sentence != null) {
+      _words.addAll(sentence!.split(" "));
+    }
+  }
+
+  // current - returns the current element
+  @override
+  String get current {
+    if (_index >= 0 && _index <= _words.length - 1) {
+      return _words[_index];
+    } else {
+      return "";
+    }
+  }
+
+  // moveNext - returns true if there is a next element
+  @override
+  bool moveNext() {
+    if (_index < _words.length - 1) {
+      _index++;
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+class Sentence extends Iterable<String> {
+  final String? sentence;
+  const Sentence(this.sentence);
+
+  @override
+  Iterator<String> get iterator => SentenceIterator(sentence);
 }
 
 void main(List<String> args) {
@@ -430,12 +483,21 @@ void main(List<String> args) {
   List<int> myList = [1, 2, 3, 4];
   var iterator = myList.iterator;
   while (iterator.moveNext()) {
-    print(iterator.current());
+    print(iterator.current);
   }
+
+  print("");
 
   final fibonacciSeries = Fibonacci(10);
   for (int number in fibonacciSeries) {
     print(number);
+  }
+
+  print("");
+
+  final sentence = Sentence("Dart is awesome");
+  for (var word in sentence) {
+    print(word);
   }
 }
 
