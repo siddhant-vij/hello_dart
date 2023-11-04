@@ -1,6 +1,5 @@
 // Dart - Beyond OOPS
 
-
 // 1. Mixins
 // Mixins allow you to share code between classes.
 // You can use any class as a mixin as long as it doesn’t extend anything besides Object .
@@ -329,4 +328,88 @@ void main(List<String> args) {
 
   final http = HttpResponseStatusCodes.internalServerError;
   print(http);
+
+  print("");
+
+  int? val1 = 1;
+  int? val2;
+  int? val3 = 3;
+  int? val4;
+  print(add(val1, val2));
+  print(add(val2, val3));
+  print(add(val2, val4));
+  print(add(val1, val3));
+
+  print("");
+
+  final map1 = {"a": 1, "b": 2};
+  final map2 = {"c": 3, "d": 4, "a": 1};
+  print(map1 + map2);
+  print(map1 - map2);
+  print(map1 * 2);
+  print(map2 * 3);
+
+  print("");
+
+  final tkey1 = "name";
+  final tkey2 = "age";
+  final tmap = {"name": "Test", "age": 21};
+  final doubleAge = tmap.applyFunction(tkey2, (int value) => value * 2);
+  print(doubleAge);
+  final ageAsString = tmap.applyFunction(tkey2, (int value) => value.toString());
+  print(ageAsString);
+  final capitalName = tmap.applyFunction(tkey1, (String value) => value.toUpperCase());
+  print(capitalName);
+}
+
+int add(int? a, int? b) {
+  return a + b;
+}
+
+extension AddOptionals<T extends num> on T? {
+  T operator +(T? other) {
+    final shadow = this;
+    if (shadow != null && other == null) {
+      return shadow;
+    } else if (shadow == null && other != null) {
+      return other;
+    } else if (shadow != null && other != null) {
+      return shadow + other as T;
+    } else {
+      return 0 as T;
+    }
+  }
+}
+
+extension MapOperations<K, V> on Map<K, V> {
+  Map<K, V> operator +(Map<K, V> other) {
+    final result = <K, V>{}
+      ..addAll(this)
+      ..addAll(other);
+    return result;
+  }
+
+  Map<K, V> operator -(Map<K, V> other) {
+    final result = <K, V>{};
+    result.addAll(this);
+    result.removeWhere((key, value) => other.containsKey(key));
+    return result;
+  }
+
+  Iterable<Map<K, V>> operator *(int times) sync* {
+    for (var i = 0; i < times; i++) {
+      yield this;
+    }
+  }
+}
+
+extension ApplyFunction<K, V, R> on Map<K, V> {
+  R? applyFunction<T>(K key, R? Function(T value) func) {
+    final value = this[key];
+    if (value != null) {
+      return func(value as T);
+    } else {
+      return null;
+    }
+  }
 }
